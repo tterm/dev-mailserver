@@ -1,0 +1,32 @@
+.list-view .list-cell:filled:focused:selected {
+    -fx-background-color: #3f51b5;
+    -fx-text-fill: #fff;
+}
+
+.title-pane {
+    -fx-padding: 5px 10px;
+    -fx-spacing: 5px;
+    -fx-background-color: #3f51b5;
+    -fx-alignment: center-left;
+}
+
+.title-pane .title, .title-pane .label {
+    -fx-text-fill: #fff;
+}
+
+.title-pane .title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-padding: 10px 5px;
+}
+
+.title-pane .port-field {
+    -fx-padding: 5px;
+}
+
+.title-pane .start-stop-button {
+    -fx-border-color: transparent;
+    -fx-border-style: solid;
+    -fx-border-width: 0px;
+    -fx-padding: 0 5px;
+}
