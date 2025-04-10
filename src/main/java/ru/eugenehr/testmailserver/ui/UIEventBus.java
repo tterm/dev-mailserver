@@ -26,7 +26,7 @@ import javafx.application.Platform;
  */
 public class UIEventBus {
 
-    private static EventBus INSTANCE;
+    private static volatile EventBus INSTANCE;
     private static boolean ENABLED = false;
 
     private static EventBus getInstance() {

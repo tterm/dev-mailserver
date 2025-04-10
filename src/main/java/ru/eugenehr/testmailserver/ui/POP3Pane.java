@@ -33,7 +33,7 @@ import ru.eugenehr.testmailserver.event.SessionEvent;
  */
 public class POP3Pane extends ServerPane {
 
-    private static final Logger logger = LoggerFactory.getLogger(POP3Pane.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(POP3Pane.class);
 
     /**
      * Creates a POP3 server pane.

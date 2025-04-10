@@ -36,7 +36,7 @@ public class Application extends javafx.application.Application {
     private final ResourceBundle bundle = ResourceBundle.getBundle(Application.class.getName());
 
     @Override
-    public void start(Stage stage) throws Exception {
+    public void start(Stage stage) {
         UIEventBus.setEnabled(true);
 
         final SMTPPane smtpPane = new SMTPPane();

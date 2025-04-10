@@ -51,20 +51,20 @@ import ru.eugenehr.testmailserver.ui.UIEventBus;
 @Sharable
 public class SMTPHandler extends ChannelInboundHandlerAdapter {
 
-    private static final Logger logger = LoggerFactory.getLogger(SMTPHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SMTPHandler.class);
     private static final Pattern RCPT_PATTERN = Pattern.compile("^.*<([^>]+)>$");
 
     @Override
     public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
         final Channel channel = ctx.channel();
-        logger.info("Client connected: {}", channel.remoteAddress());
+        LOGGER.info("Client connected: {}", channel.remoteAddress());
 
         final Attribute<State> state = channel.attr(AttributeKey.valueOf("state"));
         state.set(new State());
 
         // Send greetings
         final String message = "220 Test Mail Server\r\n";
-        logger.debug(">>: {}", message.trim());
+        LOGGER.debug(">>: {}", message.trim());
         channel.writeAndFlush(message);
 
         // Notify UI
@@ -74,7 +74,7 @@ public class SMTPHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
-        logger.info("Client disconnected: {}", ctx.channel().remoteAddress());
+        LOGGER.info("Client disconnected: {}", ctx.channel().remoteAddress());
 
         final Channel channel = ctx.channel();
         final String channelId = channel.id().toString();
@@ -84,13 +84,13 @@ public class SMTPHandler extends ChannelInboundHandlerAdapter {
         final State state = attr.get();
 
         if (state.file != null && state.file.exists()) {
-            logger.debug("Cleaning temporary files...");
+            LOGGER.debug("Cleaning temporary files...");
             try {
                 if (state.file.delete()) {
-                    logger.debug("File '{}' deleted", state.file.getAbsolutePath());
+                    LOGGER.debug("File '{}' deleted", state.file.getAbsolutePath());
                 }
             } catch (Exception ex) {
-                logger.error("Could not delete file '{}': {}", state.file.getAbsolutePath(), ex.getMessage());
+                LOGGER.error("Could not delete file '{}': {}", state.file.getAbsolutePath(), ex.getMessage());
             }
         }
 
@@ -103,7 +103,7 @@ public class SMTPHandler extends ChannelInboundHandlerAdapter {
         if (event instanceof IdleStateEvent) {
             IdleStateEvent idleStateEvent = (IdleStateEvent) event;
             if (idleStateEvent.state() == IdleState.READER_IDLE) {
-                logger.info("Closing client connection {} because Keep-Alive timeout has expired",
+                LOGGER.info("Closing client connection {} because Keep-Alive timeout has expired",
                     ctx.channel().remoteAddress());
                 ctx.close();
             }
@@ -112,7 +112,8 @@ public class SMTPHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        super.exceptionCaught(ctx, cause);
+        // No super execute because we are the last handler currently and therefor need to handle
+        // the exception
         ctx.close();
     }
 
@@ -120,7 +121,7 @@ public class SMTPHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         final Channel channel = ctx.channel();
         final String channelId = channel.id().toString();
-        logger.debug("<<: {}", msg);
+        LOGGER.debug("<<: {}", msg);
 
         final String message = msg.toString();
         UIEventBus.post(new SMTPSessionLogEvent(channelId, Direction.CLIENT, message));
@@ -138,7 +139,7 @@ public class SMTPHandler extends ChannelInboundHandlerAdapter {
                 if (state.file != null) {
                     final Set<String> files = MailServer.getInstance().getMailboxes()
                         .addMessage(state.from, state.to, state.file);
-                    logger.info("Message saved to {}", files);
+                    LOGGER.info("Message saved to {}", files);
                 }
                 response = "250 " + length + " bytes accepted\r\n";
             } else {
@@ -190,7 +191,7 @@ public class SMTPHandler extends ChannelInboundHandlerAdapter {
                 response = "500 ERROR\r\n";
             }
         }
-        logger.debug(">>: {}", response.trim());
+        LOGGER.debug(">>: {}", response.trim());
         channel.writeAndFlush(response);
         UIEventBus.post(new SMTPSessionLogEvent(channelId, Direction.SERVER, response));
 
@@ -222,7 +223,7 @@ public class SMTPHandler extends ChannelInboundHandlerAdapter {
                 }
                 stream.write(message.getBytes());
             } catch (IOException ex) {
-                logger.error("Could not write data to file '{}': {}", file.getAbsolutePath(), ex.getMessage());
+                LOGGER.error("Could not write data to file '{}': {}", file.getAbsolutePath(), ex.getMessage());
                 throw new RuntimeException(ex);
             }
         }
@@ -237,7 +238,7 @@ public class SMTPHandler extends ChannelInboundHandlerAdapter {
                 try {
                     stream.close();
                 } catch (IOException ex) {
-                    logger.error("Could not close file '{}': {}", file.getAbsolutePath(), ex.getMessage());
+                    LOGGER.error("Could not close file '{}': {}", file.getAbsolutePath(), ex.getMessage());
                     throw new RuntimeException(ex);
                 }
             }

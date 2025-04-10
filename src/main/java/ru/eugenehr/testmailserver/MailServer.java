@@ -48,7 +48,7 @@ import ru.eugenehr.testmailserver.ui.Application;
  */
 public class MailServer {
 
-    private static final Logger logger = LoggerFactory.getLogger(MailServer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MailServer.class);
     static MailServer INSTANCE; // package visible for testing purpose
     //
     private final NioEventLoopGroup bossGroup = new DaemonEventLoopGroup("listener-");
@@ -116,19 +116,19 @@ public class MailServer {
         mailboxesDir = new File(cmdLine.getOptionValue("m", mailboxesDir.getPath()));
         if (!mailboxesDir.exists()) {
             if (!mailboxesDir.mkdirs()) {
-                logger.error("Could not create directory '{}'", mailboxesDir.getAbsolutePath());
+                LOGGER.error("Could not create directory '{}'", mailboxesDir.getAbsolutePath());
                 return;
             }
         }
         INSTANCE = new MailServer(new Mailboxes(mailboxesDir));
         INSTANCE.redirectToSender = cmdLine.hasOption("sr");
 
-        int port = Integer.valueOf(cmdLine.getOptionValue("s", "0"));
+        int port = Integer.parseInt(cmdLine.getOptionValue("s", "0"));
         if (port > 0) {
             INSTANCE.startSMTP(port);
         }
 
-        port = Integer.valueOf(cmdLine.getOptionValue("p", "0"));
+        port = Integer.parseInt(cmdLine.getOptionValue("p", "0"));
         if (port > 0) {
             INSTANCE.startPOP3(port);
         }
@@ -169,9 +169,9 @@ public class MailServer {
      * @param port port to listen to
      * @throws Exception if any
      */
-    public Channel startSMTP(int port) throws Exception {
+    public Channel startSMTP(int port) {
         stopSMTP();
-        logger.info("Starting SMTP server on port {}...", port);
+        LOGGER.info("Starting SMTP server on port {}...", port);
         smtpPort = port;
         return smtpChannel = startChannel(port, new SMTPHandler());
     }
@@ -181,7 +181,7 @@ public class MailServer {
      */
     public void stopSMTP() {
         if (isSMTPStarted()) {
-            logger.info("Stopping SMTP server...");
+            LOGGER.info("Stopping SMTP server...");
             stopChannel(smtpChannel);
             smtpChannel = null;
         }
@@ -206,9 +206,9 @@ public class MailServer {
      * @param port port to listen to
      * @throws Exception if any
      */
-    public Channel startPOP3(int port) throws Exception {
+    public Channel startPOP3(int port) {
         stopPOP3();
-        logger.info("Starting POP3 server on port {}...", port);
+        LOGGER.info("Starting POP3 server on port {}...", port);
         pop3Port = port;
         return pop3Channel = startChannel(port, new POP3Handler());
     }
@@ -218,7 +218,7 @@ public class MailServer {
      */
     public void stopPOP3() {
         if (isPOP3Started()) {
-            logger.info("Stopping SMTP server...");
+            LOGGER.info("Stopping POP3 server...");
             stopChannel(pop3Channel);
             pop3Channel = null;
         }
@@ -264,13 +264,13 @@ public class MailServer {
      * @param handler server handler
      * @return server channel
      */
-    private Channel startChannel(int port, ChannelInboundHandler handler) throws Exception {
+    private Channel startChannel(int port, ChannelInboundHandler handler) {
         final Channel channel = new ServerBootstrap()
             .group(bossGroup, workerGroup)
             .channel(NioServerSocketChannel.class)
             .childHandler(new ChannelInitializer<SocketChannel>() {
                 @Override
-                protected void initChannel(SocketChannel channel) throws Exception {
+                protected void initChannel(SocketChannel channel) {
                     // Keep alive timeout
                     channel.pipeline().addLast("keepAliveHandler",
                         new IdleStateHandler(60, 30, 0));

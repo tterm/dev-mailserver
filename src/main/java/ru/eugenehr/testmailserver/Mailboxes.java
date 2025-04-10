@@ -44,7 +44,7 @@ import ru.eugenehr.testmailserver.ui.UIEventBus;
  */
 public class Mailboxes {
 
-    private static final Logger logger = LoggerFactory.getLogger(Mailboxes.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Mailboxes.class);
     private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyyMMddHHmmssSSS");
 
     private File root;
@@ -63,7 +63,7 @@ public class Mailboxes {
     }
 
     public void setRoot(File root) {
-        logger.info("Using '{}' directory to store user mailboxes", root.getAbsolutePath());
+        LOGGER.info("Using '{}' directory to store user mailboxes", root.getAbsolutePath());
         this.root = root;
     }
 
@@ -171,7 +171,7 @@ public class Mailboxes {
             dest.getParentFile().mkdirs();
             FileUtils.copyFile(source, dest);
         } catch (IOException ex) {
-            logger.error("Could not copy file '{}' to '{}': {}", source, dest, ex.getMessage());
+            LOGGER.error("Could not copy file '{}' to '{}': {}", source, dest, ex.getMessage());
             throw new RuntimeException(ex);
         }
     }

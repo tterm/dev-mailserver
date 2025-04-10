@@ -157,7 +157,7 @@ abstract class ServerPane extends BorderPane {
             final String port = portField.getText();
             if (!port.isEmpty()) {
                 try {
-                    startServer(Integer.valueOf(port));
+                    startServer(Integer.parseInt(port));
                 } catch (Exception ex) {
                     final Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setTitle(getString("errorAlert.title"));
@@ -257,7 +257,7 @@ abstract class ServerPane extends BorderPane {
      */
     private static class SessionViewItem {
         private final List<SessionLogEvent> events;
-        private String sessionId;
+        private final String sessionId;
         private boolean active;
 
         public SessionViewItem(String sessionId) {
@@ -271,8 +271,7 @@ abstract class ServerPane extends BorderPane {
             if (this == other) {
                 return true;
             }
-            if (other instanceof SessionViewItem) {
-                SessionViewItem that = (SessionViewItem) other;
+            if (other instanceof SessionViewItem that) {
                 return Objects.equals(sessionId, that.sessionId);
             } else if (other instanceof String) {
                 return Objects.equals(sessionId, other);

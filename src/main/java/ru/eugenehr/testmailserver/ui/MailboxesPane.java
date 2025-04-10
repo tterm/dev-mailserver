@@ -16,12 +16,6 @@
 
 package ru.eugenehr.testmailserver.ui;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ResourceBundle;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
-
 import com.google.common.eventbus.Subscribe;
 import io.netty.util.CharsetUtil;
 import javafx.application.Platform;
@@ -33,10 +27,14 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import org.apache.commons.io.FileUtils;
-
 import ru.eugenehr.testmailserver.MailServer;
 import ru.eugenehr.testmailserver.Mailboxes;
 import ru.eugenehr.testmailserver.event.MailboxEvent;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ResourceBundle;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Users mailboxes pane.
@@ -124,9 +122,7 @@ public class MailboxesPane extends BorderPane {
             if (file.exists()) {
                 CompletableFuture.supplyAsync(() -> {
                     try {
-                        return FileUtils.readLines(file, CharsetUtil.US_ASCII)
-                            .stream()
-                            .collect(Collectors.joining("\n"));
+                        return String.join("\n", FileUtils.readLines(file, CharsetUtil.US_ASCII));
                     } catch (IOException ex) {
                         throw new RuntimeException(ex);
                     }
@@ -158,7 +154,7 @@ public class MailboxesPane extends BorderPane {
                 boolean selected = event.message.equals(messagesView.getSelectionModel().getSelectedItem());
                 messagesView.getItems().remove(event.message);
                 // Restore selection
-                if (selected && messagesView.getItems().size() > 0) {
+                if (selected && !messagesView.getItems().isEmpty()) {
                     messagesView.getSelectionModel().select(0);
                 }
             }

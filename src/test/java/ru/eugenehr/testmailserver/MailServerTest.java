@@ -47,23 +47,25 @@ import static org.junit.Assert.assertTrue;
  */
 public class MailServerTest {
 
-    private static final String LOREM_IPSUM = "Lorem ipsum dolor sit amet, consectetur adipiscing elit,\n"
-        + "sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\n"
-        + "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris\n"
-        + "nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in\n"
-        + "reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla\n"
-        + "pariatur. Excepteur sint occaecat cupidatat non proident, sunt in\n"
-        + "culpa qui officia deserunt mollit anim id est laborum.";
+    private static final String LOREM_IPSUM = """
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+            sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
+            nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+            reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+            pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+            culpa qui officia deserunt mollit anim id est laborum.""";
 
-    private static final String LOREM_IPSUM_RU_UTF8 = "Что такое Lorem Ipsum?\n"
-        + "Lorem Ipsum - это текст-\"рыба\", часто используемый в печати и вэб-дизайне.\n"
-        + "Lorem Ipsum является стандартной \"рыбой\" для текстов на латинице с начала XVI века.\n"
-        + "В то время некий безымянный печатник создал большую коллекцию размеров и форм шрифтов,\n"
-        + "используя Lorem Ipsum для распечатки образцов. Lorem Ipsum не только успешно пережил\n"
-        + "без заметных изменений пять веков, но и перешагнул в электронный дизайн.\n"
-        + "Его популяризации в новое время послужили публикация листов Letraset с образцами\n"
-        + "Lorem Ipsum в 60-х годах и, в более недавнее время, программы электронной вёрстки\n"
-        + "типа Aldus PageMaker, в шаблонах которых используется Lorem Ipsum.";
+    private static final String LOREM_IPSUM_RU_UTF8 = """
+            Что такое Lorem Ipsum?
+            Lorem Ipsum - это текст-"рыба", часто используемый в печати и вэб-дизайне.
+            Lorem Ipsum является стандартной "рыбой" для текстов на латинице с начала XVI века.
+            В то время некий безымянный печатник создал большую коллекцию размеров и форм шрифтов,
+            используя Lorem Ipsum для распечатки образцов. Lorem Ipsum не только успешно пережил
+            без заметных изменений пять веков, но и перешагнул в электронный дизайн.
+            Его популяризации в новое время послужили публикация листов Letraset с образцами
+            Lorem Ipsum в 60-х годах и, в более недавнее время, программы электронной вёрстки
+            типа Aldus PageMaker, в шаблонах которых используется Lorem Ipsum.""";
 
     private static Properties props;
 
@@ -88,7 +90,7 @@ public class MailServerTest {
     }
 
     @AfterClass
-    public static void tearDown() throws Exception {
+    public static void tearDown() {
         MailServer.getInstance().stopSMTP();
         MailServer.getInstance().stopPOP3();
     }
@@ -154,7 +156,7 @@ public class MailServerTest {
         assertTrue(content instanceof Multipart);
         bodyPart = ((Multipart) content).getBodyPart(0);
         assertTrue(bodyPart.getContentType().startsWith("text/plain"));
-        assertEquals(bodyPart.getContent(), "Test message");
+        assertEquals("Test message", bodyPart.getContent());
         inbox.close(true);
     }
 }

@@ -51,19 +51,19 @@ import ru.eugenehr.testmailserver.ui.UIEventBus;
 @Sharable
 public class POP3Handler extends ChannelInboundHandlerAdapter {
 
-    private static final Logger logger = LoggerFactory.getLogger(POP3Handler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(POP3Handler.class);
 
     @Override
-    public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
+    public void channelRegistered(ChannelHandlerContext ctx) {
         final Channel channel = ctx.channel();
-        logger.info("Client connected: {}", channel.remoteAddress());
+        LOGGER.info("Client connected: {}", channel.remoteAddress());
 
         final Attribute<State> state = channel.attr(AttributeKey.valueOf("state"));
         state.set(new State());
 
         // Send greetings
         final String message = "+OK Test Mail Server\r\n";
-        logger.debug(">>: {}", message.trim());
+        LOGGER.debug(">>: {}", message.trim());
         channel.writeAndFlush(message);
 
         // Notify UI
@@ -72,8 +72,8 @@ public class POP3Handler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
-    public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
-        logger.info("Client disconnected: {}", ctx.channel().remoteAddress());
+    public void channelUnregistered(ChannelHandlerContext ctx) {
+        LOGGER.info("Client disconnected: {}", ctx.channel().remoteAddress());
 
         final Channel channel = ctx.channel();
         final String channelId = channel.id().toString();
@@ -87,11 +87,10 @@ public class POP3Handler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
-    public void userEventTriggered(ChannelHandlerContext ctx, Object event) throws Exception {
-        if (event instanceof IdleStateEvent) {
-            IdleStateEvent idleStateEvent = (IdleStateEvent) event;
+    public void userEventTriggered(ChannelHandlerContext ctx, Object event) {
+        if (event instanceof IdleStateEvent idleStateEvent) {
             if (idleStateEvent.state() == IdleState.READER_IDLE) {
-                logger.info("Closing client connection {} because Keep-Alive timeout has expired",
+                LOGGER.info("Closing client connection {} because Keep-Alive timeout has expired",
                     ctx.channel().remoteAddress());
                 ctx.close();
             }
@@ -100,7 +99,7 @@ public class POP3Handler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        super.exceptionCaught(ctx, cause);
+        //super.exceptionCaught(ctx, cause);
         ctx.close();
     }
 
@@ -108,7 +107,7 @@ public class POP3Handler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         final Channel channel = ctx.channel();
         final String channelId = channel.id().toString();
-        logger.debug("<<: {}", msg);
+        LOGGER.debug("<<: {}", msg);
 
         final String message = msg.toString();
         UIEventBus.post(new POP3SessionLogEvent(channelId, Direction.CLIENT, message));
@@ -118,113 +117,113 @@ public class POP3Handler extends ChannelInboundHandlerAdapter {
 
         final Mailboxes mailboxes = MailServer.getInstance().getMailboxes();
 
-        String response;
+        StringBuilder response;
         boolean closeConnection = false;
         if (message.matches("^(USER|APOP)\\s.+")) {
             state.mailbox = message.substring(5).split("\\s")[0];
             state.messages = new ArrayList<>(mailboxes.getMessages(state.mailbox));
             state.deleted = new ArrayList<>();
-            response = "+OK\r\n";
+            response = new StringBuilder("+OK\r\n");
         } else if (message.startsWith("PASS ")) {
             if (state.mailbox == null) {
-                response = "-ERR No user given\r\n";
+                response = new StringBuilder("-ERR No user given\r\n");
             } else {
-                response = "+OK\r\n";
+                response = new StringBuilder("+OK\r\n");
             }
         } else if (message.equals("CAPA")) {
-            response = "+OK\r\nUIDL\r\n.\r\n";
+            response = new StringBuilder("+OK\r\nUIDL\r\nUSER\r\n.\r\n");
         } else if (message.equals("STAT")) {
             if (state.mailbox == null) {
-                response = "-ERR No user given\r\n";
+                response = new StringBuilder("-ERR No user given\r\n");
             } else {
-                response = "+OK "
-                    + state.messages.size() + " "
-                    + state.messages.stream()
-                    .map(file -> mailboxes.getMessage(state.mailbox, file))
-                    .filter(File::exists).mapToLong(File::length).sum() + "\r\n";
+                response = new StringBuilder("+OK "
+                        + state.messages.size() + " "
+                        + state.messages.stream()
+                        .map(file -> mailboxes.getMessage(state.mailbox, file))
+                        .filter(File::exists).mapToLong(File::length).sum() + "\r\n");
             }
         } else if (message.startsWith("LIST")) {
             if (state.mailbox == null) {
-                response = "-ERR No user given\r\n";
+                response = new StringBuilder("-ERR No user given\r\n");
             } else {
-                response = "+OK\r\n";
+                response = new StringBuilder("+OK\r\n");
                 if (message.equals("LIST")) {
                     for (int i = 0; i < state.messages.size(); i++) {
                         final String mail = state.messages.get(i);
                         if (!state.deleted.contains(mail)) {
-                            response += (i + 1) + " "
-                                + mailboxes.getMessage(state.mailbox, mail).length() + "\r\n";
+                            response.append((i + 1)).append(" ").append(mailboxes.getMessage(state.mailbox, mail).length()).append("\r\n");
                         }
                     }
-                    response += ".\r\n";
+                    response.append(".\r\n");
                 } else {
                     String index = message.substring(5);
                     if (index.matches("\\d+")) {
-                        int num = Integer.valueOf(index);
+                        int num = Integer.parseInt(index);
                         if (num > state.messages.size()) {
-                            response = "-ERR Invalid message number\r\n";
+                            response = new StringBuilder("-ERR Invalid message number\r\n");
                         } else {
                             final String mail = state.messages.get(num - 1);
                             if (!state.deleted.contains(mail)) {
-                                response += num + " " + mailboxes.getMessage(state.mailbox,
-                                    state.messages.get(num - 1)).length() + "\r\n";
+                                response.append(num).append(" ").append(mailboxes.getMessage(state.mailbox,
+                                        state.messages.get(num - 1)).length()).append("\r\n");
                             }
-                            response += ".\r\n";
+                            response.append(".\r\n");
                         }
                     } else {
-                        response = "-ERR Invalid message number\r\n";
+                        response = new StringBuilder("-ERR Invalid message number\r\n");
                     }
                 }
             }
         } else if (message.equals("UIDL")) {
             if (state.mailbox == null) {
-                response = "-ERR no user given\r\n";
+                response = new StringBuilder("-ERR no user given\r\n");
             } else {
-                response = "+OK\r\n";
+                response = new StringBuilder("+OK\r\n");
                 for (int i = 0; i < state.messages.size(); i++) {
-                    response += (i + 1) + " " + state.messages.get(i) + "\r\n";
+                    response.append((i + 1)).append(" ").append(state.messages.get(i)).append("\r\n");
                 }
-                response += ".\r\n";
+                response.append(".\r\n");
             }
         } else if (message.startsWith("RETR ")) {
             if (state.mailbox == null) {
-                response = "-ERR no user given\r\n";
+                response = new StringBuilder("-ERR no user given\r\n");
             } else {
                 String index = message.substring(5);
                 if (index.matches("\\d+")) {
-                    int num = Integer.valueOf(index);
+                    int num = Integer.parseInt(index);
                     if (num > state.messages.size()) {
-                        response = "-ERR Invalid message number\r\n";
+                        response = new StringBuilder("-ERR Invalid message number\r\n");
                     } else {
                         final String mail = state.messages.get(num - 1);
                         if (!state.deleted.contains(mail)) {
                             final File file = mailboxes.getMessage(state.mailbox, state.messages.get(num - 1));
                             if (file.exists() && file.canRead()) {
-                                response = "+OK " + file.length() + "\r\n"
-                                    + FileUtils.readLines(file, CharsetUtil.US_ASCII)
-                                    .stream().collect(Collectors.joining("\r\n"))
-                                    + "\r\n.\r\n";
+                                // TODO replace this expressin
+                                response = new StringBuilder("+OK " + file.length() + "\r\n"
+                                        + FileUtils.readLines(file, CharsetUtil.US_ASCII)
+                                        .stream().collect(Collectors.joining("\r\n"))
+                                        + "\r\n.\r\n");
                             } else {
-                                response = "-ERR Message deleted\r\n";
+                                response = new StringBuilder("-ERR Message deleted\r\n");
                             }
                         } else {
-                            response = "-ERR Message deleted\r\n";
+                            response = new StringBuilder("-ERR Message deleted\r\n");
                         }
                     }
                 } else {
-                    response = "-ERR Invalid message number\r\n";
+                    response = new StringBuilder("-ERR Invalid message number\r\n");
                 }
             }
         } else if (message.startsWith("TOP ")) {
             if (state.mailbox == null) {
-                response = "-ERR no user given\r\n";
+                response = new StringBuilder("-ERR no user given\r\n");
             } else {
                 String[] parts = message.substring(4).split("\\s", 2);
                 String index = parts[0];
                 if (index.matches("\\d+")) {
-                    int num = Integer.valueOf(index);
+                    int num = Integer.parseInt(index);
                     if (num > state.messages.size()) {
-                        response = "-ERR Invalid message number\r\n";
+                        response = new StringBuilder("-ERR Invalid message number\r\n");
                     } else {
                         final String mail = state.messages.get(num - 1);
                         if (!state.deleted.contains(mail)) {
@@ -232,14 +231,14 @@ public class POP3Handler extends ChannelInboundHandlerAdapter {
                             if (file.exists() && file.canRead()) {
                                 index = parts[1];
                                 if (index.matches("\\d+")) {
-                                    num = Integer.valueOf(index);
-                                    response = "+OK\r\n";
+                                    num = Integer.parseInt(index);
+                                    response = new StringBuilder("+OK\r\n");
                                     // Read message headers
                                     final ListIterator<String> it = FileUtils
                                         .readLines(file, CharsetUtil.US_ASCII).listIterator();
                                     while (it.hasNext()) {
                                         final String line = it.next();
-                                        response += line + "\r\n";
+                                        response.append(line).append("\r\n");
                                         if (line.isEmpty()) {
                                             break;
                                         }
@@ -248,59 +247,59 @@ public class POP3Handler extends ChannelInboundHandlerAdapter {
                                     for (int i = 0; i < num; i++) {
                                         if (it.hasNext()) {
                                             final String line = it.next();
-                                            response += line + "\r\n";
+                                            response.append(line).append("\r\n");
                                         } else {
                                             break;
                                         }
                                     }
-                                    response += ".\r\n";
+                                    response.append(".\r\n");
                                 } else {
-                                    response = "-ERR Invalid lines count format\r\n";
+                                    response = new StringBuilder("-ERR Invalid lines count format\r\n");
                                 }
                             } else {
-                                response = "-ERR Message deleted\r\n";
+                                response = new StringBuilder("-ERR Message deleted\r\n");
                             }
                         } else {
-                            response = "-ERR Message deleted\r\n";
+                            response = new StringBuilder("-ERR Message deleted\r\n");
                         }
                     }
                 } else {
-                    response = "-ERR Invalid message number\r\n";
+                    response = new StringBuilder("-ERR Invalid message number\r\n");
                 }
             }
         } else if (message.startsWith("DELE ")) {
             if (state.mailbox == null) {
-                response = "-ERR no user given\r\n";
+                response = new StringBuilder("-ERR no user given\r\n");
             } else {
                 String index = message.substring(5);
                 if (index.matches("\\d+")) {
-                    int num = Integer.valueOf(index);
+                    int num = Integer.parseInt(index);
                     if (num > state.messages.size()) {
-                        response = "-ERR Invalid message number\r\n";
+                        response = new StringBuilder("-ERR Invalid message number\r\n");
                     } else {
                         final String mail = state.messages.get(num - 1);
                         if (!state.deleted.contains(mail)) {
                             state.deleted.add(mail);
-                            response = "+OK\r\n";
+                            response = new StringBuilder("+OK\r\n");
                         } else {
-                            response = "-ERR Message deleted\r\n";
+                            response = new StringBuilder("-ERR Message deleted\r\n");
                         }
                     }
                 } else {
-                    response = "-ERR Invalid message number\r\n";
+                    response = new StringBuilder("-ERR Invalid message number\r\n");
                 }
             }
         } else if (message.equals("RSET")) {
             if (state.mailbox == null) {
-                response = "-ERR no user given\r\n";
+                response = new StringBuilder("-ERR no user given\r\n");
             } else {
                 state.deleted.clear();
-                response = "+OK\r\n";
+                response = new StringBuilder("+OK\r\n");
             }
         } else if (message.equals("NOOP")) {
-            response = "+OK\r\n";
+            response = new StringBuilder("+OK\r\n");
         } else if (message.equals("QUIT")) {
-            response = "+OK\r\n";
+            response = new StringBuilder("+OK\r\n");
             // Remove deleted files
             state.deleted.stream()
                 .map(mail -> mailboxes.getMessage(state.mailbox, mail))
@@ -312,11 +311,11 @@ public class POP3Handler extends ChannelInboundHandlerAdapter {
                 });
             closeConnection = true;
         } else {
-            response = "-ERR Not implemented\r\n";
+            response = new StringBuilder("-ERR Not implemented\r\n");
         }
-        logger.debug(">>: {}", response.trim());
-        channel.writeAndFlush(response);
-        UIEventBus.post(new POP3SessionLogEvent(channelId, Direction.SERVER, response));
+        LOGGER.debug(">>: {}", response.toString().trim());
+        channel.writeAndFlush(response.toString());
+        UIEventBus.post(new POP3SessionLogEvent(channelId, Direction.SERVER, response.toString()));
 
         if (closeConnection) {
             ctx.close();

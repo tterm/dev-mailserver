@@ -37,7 +37,7 @@ import ru.eugenehr.testmailserver.event.SessionEvent;
  */
 public class SMTPPane extends ServerPane {
 
-    private static final Logger logger = LoggerFactory.getLogger(SMTPPane.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SMTPPane.class);
 
     /**
      * Creates a SMTP server pane.
