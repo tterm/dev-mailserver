@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <!-- Console Appender -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level: %msg%n%throwable"/>
+        </Console>
+
+        <!-- File Appender -->
+        <File name="File" fileName="logs/app.log">
+            <PatternLayout>
+                <Pattern>%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level: %msg%n%throwable</Pattern>
+            </PatternLayout>
+        </File>
+    </Appenders>
+
+    <Loggers>
+        <!-- Root Logger -->
+        <Root level="info">
+            <AppenderRef ref="Console"/>
+        </Root>
+
+        <!-- Example for a specific package -->
+        <!--<Logger name="com.example" level="debug" additivity="false">
+            <AppenderRef ref="Console"/>
+        </Logger>-->
+
+    </Loggers>
+</Configuration>

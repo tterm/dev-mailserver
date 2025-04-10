@@ -19,7 +19,7 @@ It is not intended to use it somehow in production, only for testing purpose.
 
 - Java 17+
 - Maven
-- CI/CD via GitHub Actions (coming soon)
+- CI/CD via GitHub Actions
 
 ---
 
