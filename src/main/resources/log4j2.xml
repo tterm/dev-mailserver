@@ -3,7 +3,7 @@
     <Appenders>
         <!-- Console Appender -->
         <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level: %msg%n%throwable"/>
+            <PatternLayout pattern="| %d{ISO8601}{GMT+0} | %t | %logger(%L) | %level | %msg%n"/>
         </Console>
 
         <!-- File Appender -->
@@ -15,15 +15,12 @@
     </Appenders>
 
     <Loggers>
-        <!-- Root Logger -->
         <Root level="info">
             <AppenderRef ref="Console"/>
         </Root>
 
-        <!-- Example for a specific package -->
-        <!--<Logger name="com.example" level="debug" additivity="false">
+        <Logger name="ru.eugenehr" level="info" additivity="false">
             <AppenderRef ref="Console"/>
-        </Logger>-->
-
+        </Logger>
     </Loggers>
 </Configuration>
