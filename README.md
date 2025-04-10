@@ -1,21 +1,53 @@
-# test-mail-server
+# dev-mailserver
+
+A modern, lightweight mail server for development and testing purposes – now restructured and updated for Java 17 and beyond.
+
+This project is based on the original [test-mail-server](https://github.com/eugenehr/test-mail-server) by Eugene Khrustalev, but has been restructured and rebooted with a focus on modern tooling, maintainability, and extensibility. The first commit is the original version.
+
+It is not intended to use it somehow in production, only for testing purpose.
+
+---
+
+## ✨ Goals
+
+- **Java 17 migration** with up-to-date dependencies
+- Designed for test environments, integration testing, and developer workflows
+
+---
+
+## 🔧 Tech Stack
+
+- Java 17+
+- Maven
+- CI/CD via GitHub Actions (coming soon)
+
+---
+
+## 📦 Project Status
+
+This repository currently contains the final state of the original project (single commit), serving as the base for further modernization and improvements.
+
+---
+
+## 📝 License
+
+This project is licensed under the [Apache License 2.0](LICENSE).
+
+> This project is derived from the original work of [Eugene Khrustalev](https://github.com/eugenehr/test-mail-server).  
+> All original license and copyright notices are retained.
+
+# dev-mailserver
 
 A SMTP/POP3 server for testing purposes purely written on Java&trade; with the [Netty](https://netty.io) framework. 
 
-
-### Requirements
-
-You need a Java 8 or newer installed on your machine.
-
-
 ### Usage
 
-The **test-mail-server-&lt;version&gt;.jar** is auto-executable.
+The **dev-mailserver-&lt;version&gt;.jar** is auto-executable.
 If your desktop environment supports it, you can directly double click on the .jar. 
 Otherwise, run the following command with the next command-line arguments.
 
 ```
-java -jar test-mail-server-<version>.jar <args>
+java -jar dev-mailserver-<version>.jar <args>
 ```
 
 ### Command-line arguments
@@ -47,11 +79,3 @@ Shows a list of POP3 transactions and its details.
 
 Shows a list of user's mailboxes, messages in mailboxes and message's bodies.
 
-
-### Erlang version
-
-An [Erlang&trade;-based version](https://github.com/eugenehr/testmailsrv) is also available.
-
-### Licensing mumbo-jumbo
-
-This software is licensed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).

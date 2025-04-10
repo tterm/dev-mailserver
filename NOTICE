@@ -1,0 +1,19 @@
+NOTICE
+
+This software is based on the original "test-mail-server" project by Eugene Khrustalev
+(https://github.com/eugenehr/test-mail-server), which is licensed under the Apache License 2.0.
+
+All significant changes since the initial commit in this repository are the work of the current maintainer(s) 
+and are marked accordingly in the Git history.
+
+The original project has been restructured and modernized (Java 17 migration).
+
+---
+
+Copyright 2025 tterm
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
