@@ -19,7 +19,7 @@
             <AppenderRef ref="Console"/>
         </Root>
 
-        <Logger name="ru.eugenehr" level="info" additivity="false">
+        <Logger name="com.thomas_termin.devmailserver" level="info" additivity="false">
             <AppenderRef ref="Console"/>
         </Logger>
     </Loggers>
