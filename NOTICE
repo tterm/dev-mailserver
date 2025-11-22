@@ -17,3 +17,14 @@ You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
 
+Additional Modifications Notice
+----------------------------------------------------------------------
+Modifications made by tterm in 2025 include:
+
+ - Renaming and restructuring of Java package namespaces.
+ - Minor adjustments to source files required by the package refactoring.
+
+All original copyright and license notices from the upstream project
+have been preserved as required by the Apache License 2.0.
+----------------------------------------------------------------------
+

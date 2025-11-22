@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>ru.eugenehr</groupId>
+    <groupId>com.thomastermin</groupId>
     <artifactId>dev-mailserver</artifactId>
     <version>1.1.0-SNAPSHOT</version>
 
@@ -99,7 +99,7 @@
                         <configuration>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>ru.eugenehr.testmailserver.MailServer</mainClass>
+                                    <mainClass>com.thomas_termin.devmailserver.MailServer</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>
